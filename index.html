@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부북 걸스들의 메뉴 돌림판</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7fafc; text-align: center; margin: 0; padding: 0; }
+        h1 { margin-top: 40px; color: #2d6cdf; }
+        #wheel-container { margin: 40px auto 20px; width: 350px; height: 350px; position: relative; }
+        #wheel {
+            width: 100%; height: 100%; border-radius: 50%; border: 8px solid #2d6cdf;
+            box-shadow: 0 4px 16px rgba(45,108,223,0.15);
+            transition: transform 4s cubic-bezier(.17,.67,.83,.67);
+            background: #fff;
+        }
+        #pointer {
+            width: 0; height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 30px solid #ffb300;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+        }
+        #add-menu {
+            margin: 20px auto; display: flex; justify-content: center; gap: 8px;
+        }
+        #add-menu input {
+            padding: 8px; font-size: 1em; border: 1px solid #bbb; border-radius: 4px;
+        }
+        #add-menu button, #spin-btn {
+            padding: 8px 18px; font-size: 1em; background: #2d6cdf; color: #fff;
+            border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s;
+        }
+        #add-menu button:hover, #spin-btn:hover { background: #1a417a; }
+        #result { margin-top: 30px; font-size: 1.4em; color: #2d6cdf; min-height: 2em; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <h1>오늘의 저녁 메뉴 돌림판</h1>
+    <div id="wheel-container">
+        <div id="pointer"></div>
+        <canvas id="wheel" width="350" height="350"></canvas>
+    </div>
+    <button id="spin-btn">돌리기!</button>
+    <div id="add-menu">
+        <input type="text" id="menu-input" placeholder="메뉴 추가">
+        <button onclick="addMenu()">추가</button>
+    </div>
+    <div id="result"></div>
+    <script>
+        let menus = [
+            "김치찌개", "된장찌개", "삼겹살", "치킨", "피자",
+            "비빔밥", "불고기", "라면", "돈까스", "떡볶이"
+        ];
+        const colors = [
+            "#ffb300", "#ff7043", "#66bb6a", "#42a5f5", "#ab47bc",
+            "#ec407a", "#26c6da", "#8d6e63", "#789262", "#ffa726"
+        ];
+        let angle = 0;
+        let spinning = false;
+
+        const wheel = document.getElementById('wheel');
+        const ctx = wheel.getContext('2d');
+        const spinBtn = document.getElementById('spin-btn');
+        const resultDiv = document.getElementById('result');
+
+        function drawWheel() {
+            const num = menus.length;
+            const arc = 2 * Math.PI / num;
+            ctx.clearRect(0, 0, wheel.width, wheel.height);
+            for (let i = 0; i < num; i++) {
+                ctx.beginPath();
+                ctx.moveTo(175, 175);
+                ctx.arc(175, 175, 170, arc * i, arc * (i + 1));
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.save();
+                ctx.translate(175, 175);
+                ctx.rotate(arc * i + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 18px sans-serif";
+                ctx.fillText(menus[i], 150, 10);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            if (spinning || menus.length === 0) return;
+            spinning = true;
+            resultDiv.textContent = '';
+            const num = menus.length;
+            const arc = 2 * Math.PI / num;
+            // 랜덤으로 돌릴 각도 계산
+            const randomIndex = Math.floor(Math.random() * num);
+            const stopAngle = (3 * Math.PI / 2) - (arc * randomIndex) - arc / 2;
+            const extra = 360 * 5; // 5바퀴 추가
+            const finalDeg = (stopAngle * 180 / Math.PI) + extra;
+            wheel.style.transition = "transform 4s cubic-bezier(.17,.67,.83,.67)";
+            wheel.style.transform = `rotate(${finalDeg}deg)`;
+            setTimeout(() => {
+                spinning = false;
+                wheel.style.transition = "none";
+                wheel.style.transform = `rotate(${stopAngle * 180 / Math.PI}deg)`;
+                resultDiv.textContent = `오늘의 메뉴는 "${menus[randomIndex]}"!`;
+            }, 4000);
+        }
+
+        function addMenu() {
+            const input = document.getElementById('menu-input');
+            const value = input.value.trim();
+            if (value && !menus.includes(value)) {
+                menus.push(value);
+                drawWheel();
+                input.value = '';
+            }
+        }
+
+        spinBtn.onclick = spinWheel;
+        drawWheel();
+    </script>
+</body>
+</html>
