@@ -10,7 +10,7 @@
                 background: #f7fafc;
                 text-align: center;
                 margin: 0;
-                padding: 0;
+                padding: 0 0 100px;
             }
             h1 {
                 margin-top: 40px;
@@ -33,19 +33,19 @@
                 transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
                 background: #fff;
             }
-#pointer {
-    width: 0;
-    height: 0;
-    border-left: 16px solid transparent;
-    border-right: 16px solid transparent;
-    border-bottom: 28px solid #ffb300;
-    position: absolute;
-    top: -26px;
-    left: 50%;
-    transform: translateX(-50%) rotate(180deg);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
-    z-index: 2;
-}
+            #pointer {
+                width: 0;
+                height: 0;
+                border-left: 16px solid transparent;
+                border-right: 16px solid transparent;
+                border-bottom: 28px solid #ffb300;
+                position: absolute;
+                top: -26px;
+                left: 50%;
+                transform: translateX(-50%) rotate(180deg);
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+                z-index: 2;
+            }
             #add-menu {
                 margin: 24px auto 0;
                 display: flex;
