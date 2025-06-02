@@ -15,6 +15,8 @@
             h1 {
                 margin-top: 40px;
                 color: #2d6cdf;
+                font-size: 2.1em;
+                letter-spacing: 1px;
             }
             #wheel-container {
                 margin: 40px auto 20px;
@@ -31,52 +33,121 @@
                 transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
                 background: #fff;
             }
-            #pointer {
-                width: 0;
-                height: 0;
-                border-left: 20px solid transparent;
-                border-right: 20px solid transparent;
-                border-bottom: 30px solid #ffb300;
-                position: absolute;
-                top: -30px;
-                left: 50%;
-                transform: translateX(-50%) rotate(180deg);
-            }
+#pointer {
+    width: 0;
+    height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-bottom: 28px solid #ffb300;
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+    z-index: 2;
+}
             #add-menu {
-                margin: 20px auto;
+                margin: 24px auto 0;
                 display: flex;
                 justify-content: center;
                 gap: 8px;
             }
             #add-menu input {
-                padding: 8px;
+                padding: 10px 14px;
                 font-size: 1em;
-                border: 1px solid #bbb;
-                border-radius: 4px;
+                border: 1.5px solid #bcd0ee;
+                border-radius: 6px;
+                outline: none;
+                transition: border 0.2s;
+                background: #f8fbff;
+            }
+            #add-menu input:focus {
+                border: 1.5px solid #2d6cdf;
             }
             #add-menu button,
             #spin-btn {
-                padding: 8px 18px;
+                padding: 10px 22px;
                 font-size: 1em;
-                background: #2d6cdf;
+                background: linear-gradient(90deg, #2d6cdf 80%, #4e8cff 100%);
                 color: #fff;
                 border: none;
-                border-radius: 4px;
+                border-radius: 6px;
                 cursor: pointer;
-                transition: background 0.2s;
+                font-weight: 600;
+                box-shadow: 0 2px 8px rgba(45, 108, 223, 0.08);
+                transition: background 0.2s, box-shadow 0.2s;
             }
             #add-menu button:hover,
             #spin-btn:hover {
-                background: #1a417a;
+                background: linear-gradient(90deg, #1a417a 80%, #2d6cdf 100%);
+                box-shadow: 0 4px 16px rgba(45, 108, 223, 0.15);
+            }
+            #spin-btn {
+                margin-top: 10px;
+                margin-bottom: 0;
+                font-size: 1.1em;
+                letter-spacing: 1px;
             }
             #result {
                 margin-top: 30px;
                 font-size: 1.4em;
                 color: #2d6cdf;
                 min-height: 2em;
+                font-weight: 600;
+                letter-spacing: 0.5px;
             }
             canvas {
                 display: block;
+            }
+            #menu-list {
+                margin: 24px auto 0;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                max-width: 350px;
+                min-height: 48px;
+                background: #fff;
+                border-radius: 18px;
+                box-shadow: 0 2px 10px rgba(45, 108, 223, 0.07);
+                padding: 16px 8px 8px 8px;
+            }
+            .menu-pill {
+                display: inline-flex;
+                align-items: center;
+                margin: 2px 4px;
+                padding: 6px 16px 6px 14px;
+                border-radius: 16px;
+                background: linear-gradient(90deg, #f0f4fa 80%, #e6f0ff 100%);
+                color: #2d6cdf;
+                font-size: 1em;
+                font-weight: 500;
+                box-shadow: 0 1px 4px rgba(45, 108, 223, 0.06);
+                position: relative;
+                transition: background 0.2s;
+            }
+            .menu-pill:hover {
+                background: #e6f0ff;
+            }
+            .menu-pill button {
+                margin-left: 8px;
+                background: none;
+                border: none;
+                color: #ff7043;
+                font-weight: bold;
+                cursor: pointer;
+                font-size: 1.1em;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+                line-height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.15s;
+            }
+            .menu-pill button:hover {
+                background: #ffe3db;
             }
         </style>
     </head>
@@ -92,6 +163,7 @@
             <button onclick="addMenu()">추가</button>
         </div>
         <div id="result"></div>
+        <div id="menu-list"></div>
         <script>
             let menus = ["김치찌개", "된장찌개", "삼겹살", "치킨", "피자", "비빔밥", "불고기", "라면", "돈까스", "떡볶이", "굶기", "닭가슴살", "물", "술"];
             const colors = ["#ffb300", "#ff7043", "#66bb6a", "#42a5f5", "#ab47bc", "#ec407a", "#26c6da", "#8d6e63", "#789262", "#ffa726"];
@@ -102,6 +174,7 @@
             const ctx = wheel.getContext("2d");
             const spinBtn = document.getElementById("spin-btn");
             const resultDiv = document.getElementById("result");
+            const menuListDiv = document.getElementById("menu-list");
 
             function drawWheel() {
                 const num = menus.length;
@@ -125,16 +198,27 @@
                 }
             }
 
+            function renderMenuList() {
+                menuListDiv.innerHTML = menus
+                    .map(
+                        (menu, idx) =>
+                            `<span style="display:inline-block;margin:4px 8px;padding:4px 10px;border-radius:16px;background:#f0f4fa;color:#2d6cdf;position:relative;">
+                        ${menu}
+                        <button onclick="removeMenu(${idx})" style="margin-left:6px;background:none;border:none;color:#ff7043;font-weight:bold;cursor:pointer;font-size:1em;">×</button>
+                    </span>`
+                    )
+                    .join("");
+            }
+
             function spinWheel() {
                 if (spinning || menus.length === 0) return;
                 spinning = true;
                 resultDiv.textContent = "";
                 const num = menus.length;
                 const arc = (2 * Math.PI) / num;
-                // 랜덤으로 돌릴 각도 계산
                 const randomIndex = Math.floor(Math.random() * num);
                 const stopAngle = (3 * Math.PI) / 2 - arc * randomIndex - arc / 2;
-                const extra = 360 * 5; // 5바퀴 추가
+                const extra = 360 * 5;
                 const finalDeg = (stopAngle * 180) / Math.PI + extra;
                 wheel.style.transition = "transform 4s cubic-bezier(.17,.67,.83,.67)";
                 wheel.style.transform = `rotate(${finalDeg}deg)`;
@@ -152,12 +236,21 @@
                 if (value && !menus.includes(value)) {
                     menus.push(value);
                     drawWheel();
+                    renderMenuList();
                     input.value = "";
                 }
             }
 
+            // 전역에서 호출 가능하도록 window에 등록
+            window.removeMenu = function (idx) {
+                menus.splice(idx, 1);
+                drawWheel();
+                renderMenuList();
+            };
+
             spinBtn.onclick = spinWheel;
             drawWheel();
+            renderMenuList();
         </script>
     </body>
 </html>
